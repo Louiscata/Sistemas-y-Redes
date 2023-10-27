@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "wait.h": "c",
+        "types.h": "c",
+        "signal.h": "c"
+    }
+}
