@@ -82,7 +82,7 @@ int main()
         *tid = i;
 
         // Crear hilos utilizando clone()
-        hilos[i - 1] = clone(thread_funcion, stacks[i - 1] + STACK_SIZE, CLONE_VM, tid);
+        hilos[i - 1] = clone(thread_funcion, stacks[i - 1] + STACK_SIZE, CLONE_VM | SIGCHLD, tid);
         if (hilos[i - 1] == -1)
         {
             perror("Error al crear el hilo");
@@ -91,7 +91,7 @@ int main()
     }
 
     printf("Aqui el main. He creado los hilos. Voy a esperar a que acaben.\n");
-    sleep(12);
+    
     int estado;
 
     for (int i = 0; i < NUM_HILOS; i++)
@@ -120,7 +120,7 @@ int main()
     double tiempo = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
     printf("Se ha tardado %.10lf segundos en calcularse utilizando hilos.\n\n", tiempo);
 
-    printf("Aqui el main. Voy a comenzar los cálculos de manera secuencial\n");
+    printf("Aqui el main. Voy a comenzar los cálculos de manera secuencial.\n");
     // Comenzamos a medir
     // start = clock();
     clock_gettime(CLOCK_MONOTONIC, &start); // Registra el tiempo de inicio
