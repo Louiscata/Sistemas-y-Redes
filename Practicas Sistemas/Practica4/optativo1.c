@@ -85,7 +85,7 @@ int main()
         if (WIFEXITED(estado))
         {
             int exit_estado = WEXITSTATUS(estado);
-            printf("El hijo %u termino con valor de salida: %d\n", i, exit_estado);
+            printf("El hijo %d termino con valor de salida: %d\n", i, exit_estado);
         }
     }
 
