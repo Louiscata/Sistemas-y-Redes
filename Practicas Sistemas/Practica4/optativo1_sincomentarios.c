@@ -12,8 +12,6 @@
 #define NUM_HIJOS 4
 #define MAX 1000000000
 
-// Función para la fórmula matemática. Se pasa la iteración actual por parámetros
-
 double formula(double i)
 {
     double sumpar = 0.;
@@ -32,15 +30,11 @@ int main()
     pid_t hijos[NUM_HIJOS];
     int pipelines[NUM_HIJOS][2];
 
-    // Comenzamos a medir
-    clock_gettime(CLOCK_MONOTONIC, &start); // Registra el tiempo de inicio
+    clock_gettime(CLOCK_MONOTONIC, &start);
 
-    // Creación de los hijos
     for (int i = 0; i < NUM_HIJOS; i++)
     {
-        // Pipeline para comunicar el resultado al padre
-        if (pipe(pipelines[i]) == -1)
-        {
+        if (pipe(pipelines[i]) == -1) {
             perror("Error al crear la tubería");
             exit(1);
         }
@@ -50,13 +44,12 @@ int main()
             perror("Error al crear los hijos");
             exit(1);
         }
-        else if (hijos[i] == 0) // Código de los hijos
+        else if (hijos[i] == 0)
         {
             double sumalocal = 0;
 
             printf("Soy el hijo %d con PID %d. Voy a comenzar los cálculos\n", i, getpid());
 
-            // Suma parcial
             for (int j = i * 10; j < MAX; j += NUM_HIJOS * 10)
             {
                 for (int k = j; k < j + 10; k++)
@@ -65,7 +58,6 @@ int main()
                 }
             }
 
-            // Comunicación del resultado
             write(pipelines[i][1], &sumalocal, sizeof(double));
 
             printf("Soy el hijo %d con PID %d. He terminado. Mi suma es: %.40lf\n", i, getpid(), sumalocal);
@@ -74,8 +66,7 @@ int main()
 
             exit(EXIT_SUCCESS);
         }
-        else
-        {
+        else{
             close(pipelines[i][1]);
         }
     }
@@ -84,7 +75,6 @@ int main()
 
     int estado;
 
-    // El main espera a que los hijos terminen
     for (int i = 0; i < NUM_HIJOS; i++)
     {
         waitpid(hijos[i], &estado, 0);
@@ -95,7 +85,6 @@ int main()
         }
     }
 
-    // Resultado con las sumas parciales
     double suma = 0, sumaparcial = 0;
     for (int i = 0; i < NUM_HIJOS; i++)
     {
@@ -104,32 +93,27 @@ int main()
         close(pipelines[i][0]);
     }
 
-    // Terminamos de medir
-    clock_gettime(CLOCK_MONOTONIC, &end); // Registra el tiempo de finalización
+    clock_gettime(CLOCK_MONOTONIC, &end);
 
     printf("Aqui el main. La suma total de las sumas parciales de los procesos es %.40lf\n", suma);
 
-    // Calculamos el tiempo total
     double tiempo = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
     printf("Se ha tardado %.10lf segundos en calcularse utilizando procesos.\n\n", tiempo);
 
     printf("Aqui el main. Voy a comenzar los cálculos de manera secuencial\n");
 
-    // Comenzamos a medir
-    clock_gettime(CLOCK_MONOTONIC, &start); // Registra el tiempo de inicio
+    clock_gettime(CLOCK_MONOTONIC, &start); 
 
-    // Suma secuencial
     double sumasec = 0;
     for (int i = 0; i < MAX; i++)
     {
         sumasec += formula(i);
     }
 
-    // Terminamos de medir
-    clock_gettime(CLOCK_MONOTONIC, &end); // Registra el tiempo de finalización
+    clock_gettime(CLOCK_MONOTONIC, &end); 
 
     printf("Aqui el main. La suma total secuencial es %.40f\n", sumasec);
-    // Calculamos el tiempo total
+
     tiempo = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
 
     printf("Se ha tardado %.10lf segundos en calcularse de manera secuencial.\n\n", tiempo);
